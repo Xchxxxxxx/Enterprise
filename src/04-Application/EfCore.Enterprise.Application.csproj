@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>EfCore.Enterprise.Application</RootNamespace>
+    <AssemblyName>EfCore.Enterprise.Application</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="FluentValidation" Version="11.9.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\01-Domain\EfCore.Enterprise.Domain.csproj" />
+    <ProjectReference Include="..\02-Shared\EfCore.Enterprise.Shared.csproj" />
+    <ProjectReference Include="..\03-Infrastructure\EfCore.Enterprise.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

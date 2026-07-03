@@ -1,0 +1,27 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+
+namespace EfCore.Enterprise.Application.Extensions;
+
+public static class ApplicationServiceExtensions
+{
+    public static IServiceCollection AddApplicationServices(
+        this IServiceCollection services)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssemblies(assembly);
+        });
+
+        services.AddAutoMapper(assembly);
+
+        services.AddValidatorsFromAssemblies(new[] { assembly });
+
+        return services;
+    }
+}
