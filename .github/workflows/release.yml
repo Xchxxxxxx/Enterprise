@@ -30,7 +30,7 @@ jobs:
 
       - name: Copy Framework Packages to Template
         run: |
-          mkdir -p tools/EfCore.Enterprise.Templates/content/local-packages
+          mkdir -p tools/EfCore.Enterprise.Templates/content/local-packages || true
           cp nupkgs/EfCore.Enterprise.Domain.1.0.1.nupkg tools/EfCore.Enterprise.Templates/content/local-packages/
           cp nupkgs/EfCore.Enterprise.Shared.1.0.1.nupkg tools/EfCore.Enterprise.Templates/content/local-packages/
           cp nupkgs/EfCore.Enterprise.Application.1.0.1.nupkg tools/EfCore.Enterprise.Templates/content/local-packages/
