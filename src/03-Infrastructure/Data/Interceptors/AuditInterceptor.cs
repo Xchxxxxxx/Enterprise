@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace EfCore.Enterprise.Infrastructure.Data.Interceptors;
 
-[Injectable(ServiceLifetime.Singleton)]
 public class AuditInterceptor : ISaveChangesInterceptor
 {
     private readonly IHttpContextAccessor? _httpContextAccessor;

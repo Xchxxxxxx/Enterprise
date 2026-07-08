@@ -1,12 +1,12 @@
 using EfCore.Enterprise.Domain.Events;
 using EfCore.Enterprise.Domain.Interfaces;
 using EfCore.Enterprise.Infrastructure.Services;
+using EfCore.Enterprise.Shared.DependencyInjection;
 using EfCore.Enterprise.Infrastructure.Caching;
 using EfCore.Enterprise.Infrastructure.Data;
 using EfCore.Enterprise.Infrastructure.Data.Interceptors;
 using EfCore.Enterprise.Infrastructure.Data.Optimization;
 using EfCore.Enterprise.Infrastructure.Data.ReadWriteSplitting;
-using EfCore.Enterprise.Infrastructure.Configuration;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
@@ -26,14 +26,43 @@ public static class InfrastructureServiceExtensions
         string? modelCachePath = null,
         string? complianceLogPath = null)
     {
-        services.AddInterceptors();
+        services.AddCoreServices(connectionString, enableRedis, redisConnection,
+            enableHangfire, modelCachePath, complianceLogPath);
 
-        services.AddDbContext<AppDbContext>((sp, options) =>
+        services.AddDbContext<AppDbContext>(ConfigureDbContext(typeof(AppDbContext), connectionString));
+
+        return services;
+    }
+
+    public static IServiceCollection AddInfrastructureServices<TContext>(
+        this IServiceCollection services,
+        string connectionString,
+        bool enableRedis = false,
+        string? redisConnection = null,
+        bool enableHangfire = false,
+        string? modelCachePath = null,
+        string? complianceLogPath = null)
+        where TContext : AppDbContext
+    {
+        services.AddCoreServices(connectionString, enableRedis, redisConnection,
+            enableHangfire, modelCachePath, complianceLogPath);
+
+        services.AddDbContext<TContext>(ConfigureDbContext(typeof(TContext), connectionString));
+
+        services.AddScoped<AppDbContext>(sp => sp.GetRequiredService<TContext>());
+
+        return services;
+    }
+
+    private static Action<IServiceProvider, DbContextOptionsBuilder> ConfigureDbContext(
+        Type contextType, string connectionString)
+    {
+        return (sp, options) =>
         {
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), sqlOptions =>
             {
                 sqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null);
-                sqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                sqlOptions.MigrationsAssembly(contextType.Assembly.FullName);
             });
 
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
@@ -45,7 +74,19 @@ public static class InfrastructureServiceExtensions
                 sp.GetRequiredService<SoftDeleteInterceptor>(),
                 sp.GetRequiredService<TenantInterceptor>(),
                 sp.GetRequiredService<ComplianceInterceptor>());
-        });
+        };
+    }
+
+    private static IServiceCollection AddCoreServices(
+        this IServiceCollection services,
+        string connectionString,
+        bool enableRedis,
+        string? redisConnection,
+        bool enableHangfire,
+        string? modelCachePath,
+        string? complianceLogPath)
+    {
+        services.AddInterceptors();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(ISuperRepository<>), typeof(SuperRepository<>));
@@ -119,6 +160,9 @@ public static class InfrastructureServiceExtensions
                     sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<ModelCacheManager>>()));
         }
 
+        // 自动注册 Infrastructure 程序集中标记了 [Injectable] 的服务（如 OpLogService）
+        services.AddInjectables(typeof(InfrastructureServiceExtensions).Assembly);
+
         return services;
     }
 
@@ -127,7 +171,7 @@ public static class InfrastructureServiceExtensions
         services.AddSingleton<AuditInterceptor>();
         services.AddSingleton<SoftDeleteInterceptor>();
         services.AddSingleton<SqlLogInterceptor>();
-        services.AddSingleton<NPlusOneInterceptor>();
+        services.AddScoped<NPlusOneInterceptor>();
         services.AddSingleton<FieldPermissionInterceptor>();
         services.AddSingleton<TenantInterceptor>();
         services.AddSingleton<ComplianceInterceptor>();

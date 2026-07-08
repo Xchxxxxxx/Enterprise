@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 
 namespace EfCore.Enterprise.Infrastructure.Data.Interceptors;
 
-[Injectable(ServiceLifetime.Singleton)]
 public class NPlusOneInterceptor : DbCommandInterceptor
 {
     private readonly ILogger<NPlusOneInterceptor> _logger;

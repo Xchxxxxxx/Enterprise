@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>EfCore.Enterprise.Shared</PackageId>
+    <Description>共享层：依赖注入、扩展方法、通用模型、特性标记</Description>
     <RootNamespace>EfCore.Enterprise.Shared</RootNamespace>
     <AssemblyName>EfCore.Enterprise.Shared</AssemblyName>
   </PropertyGroup>

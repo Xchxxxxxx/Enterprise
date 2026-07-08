@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>CompanyName.WebApi</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EfCore.Enterprise.Application" Version="1.0.1" />
+    <PackageReference Include="EfCore.Enterprise.Infrastructure" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\04-Application\CompanyName.Application.csproj" />
+    <ProjectReference Include="..\05-Infrastructure\CompanyName.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

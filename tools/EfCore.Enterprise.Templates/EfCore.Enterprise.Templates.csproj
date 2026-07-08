@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageId>EfCore.Enterprise.Templates</PackageId>
+    <Title>EfCore.Enterprise 企业级项目模板</Title>
+    <Authors>EfCore.Enterprise</Authors>
+    <Description>基于 DDD 的企业级 EF Core 开发框架模板。仅包含项目骨架，框架代码通过 NuGet 包引用。</Description>
+    <PackageTags>efcore;ddd;enterprise;template;webapi;framework</PackageTags>
+    <TargetFramework>net8.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <Version>1.0.1</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/Xchxxxxxx/Enterprise</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**;content\**\.vs\**" />
+    <Compile Remove="**\*" />
+  </ItemGroup>
+
+</Project>

@@ -13,7 +13,6 @@ public interface IDeadLetterQueueService
     Task DiscardAsync(string queueName, string messageId);
 }
 
-[Injectable(ServiceLifetime.Singleton)]
 public class DeadLetterQueueService : IDeadLetterQueueService
 {
     private readonly ConcurrentDictionary<string, ConcurrentQueue<DeadLetterMessage>> _queues = new();

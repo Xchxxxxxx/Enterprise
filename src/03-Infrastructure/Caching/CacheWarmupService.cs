@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace EfCore.Enterprise.Infrastructure.Caching;
 
-[Injectable(ServiceLifetime.Singleton)]
 public class CacheWarmupService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;

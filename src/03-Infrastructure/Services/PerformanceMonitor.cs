@@ -12,7 +12,6 @@ public interface IPerformanceMonitor
     PerformanceReport GetReport();
 }
 
-[Injectable(ServiceLifetime.Singleton)]
 public class PerformanceMonitor : IPerformanceMonitor
 {
     private readonly ConcurrentDictionary<string, RequestMetrics> _requestMetrics = new();
@@ -31,12 +30,12 @@ public class PerformanceMonitor : IPerformanceMonitor
 
         if (elapsedMs > 1000)
         {
-            _logger.LogWarning("慢接口告�? {Endpoint} 耗时 {ElapsedMs}ms", endpoint, elapsedMs);
+            _logger.LogWarning("慢接口告�? {Endpoint} 耗时 {ElapsedMs}ms", endpoint, elapsedMs);
         }
 
         if (metrics.ErrorRate > 0.1)
         {
-            _logger.LogError("接口错误率告�? {Endpoint} 错误�?{ErrorRate:P}", endpoint, metrics.ErrorRate);
+            _logger.LogError("接口错误率告�? {Endpoint} 错误�?{ErrorRate:P}", endpoint, metrics.ErrorRate);
         }
     }
 

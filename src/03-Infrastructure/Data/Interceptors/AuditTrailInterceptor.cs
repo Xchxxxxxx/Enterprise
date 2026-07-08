@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 
 namespace EfCore.Enterprise.Infrastructure.Data.Interceptors;
 
-[Injectable(ServiceLifetime.Singleton)]
 public class AuditTrailInterceptor : ISaveChangesInterceptor
 {
     private readonly ILogger<AuditTrailInterceptor> _logger;

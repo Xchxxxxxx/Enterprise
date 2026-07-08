@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace EfCore.Enterprise.Infrastructure.Data.Interceptors;
 
-[Injectable(ServiceLifetime.Singleton)]
 public class FieldPermissionInterceptor : IQueryExpressionInterceptor
 {
     public Expression QueryCompilationStarting(

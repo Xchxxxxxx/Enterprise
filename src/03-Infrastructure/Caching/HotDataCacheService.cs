@@ -13,7 +13,6 @@ public interface IHotDataCacheService
     T? GetOrSet<T>(string key, Func<T> factory, TimeSpan? expiry = null);
 }
 
-[Injectable(ServiceLifetime.Singleton)]
 public class HotDataCacheService : IHotDataCacheService
 {
     private readonly ConcurrentDictionary<string, CacheEntry> _cache = new();

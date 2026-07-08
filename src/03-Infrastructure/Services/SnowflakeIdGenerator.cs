@@ -9,7 +9,6 @@ public interface IIdGeneratorService
     string NextIdString();
 }
 
-[Injectable(ServiceLifetime.Singleton, ExposeAs = typeof(IIdGeneratorService))]
 public class SnowflakeIdGenerator : IIdGeneratorService
 {
     private readonly long _workerId;

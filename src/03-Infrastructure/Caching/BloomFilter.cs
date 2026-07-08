@@ -35,11 +35,8 @@ public class BloomFilter
     private IEnumerable<int> GetHashes(string item)
     {
         var bytes = Encoding.UTF8.GetBytes(item);
-        using var md5 = MD5.Create();
-        using var sha1 = SHA1.Create();
-
-        var md5Hash = md5.ComputeHash(bytes);
-        var sha1Hash = sha1.ComputeHash(bytes);
+        var md5Hash = MD5.HashData(bytes);
+        var sha1Hash = SHA1.HashData(bytes);
 
         for (var i = 0; i < _hashFunctions; i++)
         {

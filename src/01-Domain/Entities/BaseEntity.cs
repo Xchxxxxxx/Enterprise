@@ -3,6 +3,7 @@ using EfCore.Enterprise.Domain.Events;
 namespace EfCore.Enterprise.Domain.Entities;
 
 public abstract class BaseEntity<TKey>
+    where TKey : struct
 {
     public TKey Id { get; private set; } = default!;
 

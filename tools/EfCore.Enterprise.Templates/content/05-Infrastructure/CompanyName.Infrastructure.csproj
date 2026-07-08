@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>CompanyName.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EfCore.Enterprise.Infrastructure" Version="1.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\01-Domain\CompanyName.Domain.csproj" />
+    <ProjectReference Include="..\02-Shared\CompanyName.Shared.csproj" />
+    <ProjectReference Include="..\03-Contracts\CompanyName.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

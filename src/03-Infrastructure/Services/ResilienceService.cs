@@ -18,7 +18,6 @@ public interface IResilienceService
     ResiliencePipeline GetCombinedPipeline();
 }
 
-[Injectable(ServiceLifetime.Singleton)]
 public class ResilienceService : IResilienceService
 {
     private readonly ILogger<ResilienceService> _logger;

@@ -14,7 +14,6 @@ public interface IPerformanceMetrics
     Meter Meter { get; }
 }
 
-[Injectable(ServiceLifetime.Singleton)]
 public class PerformanceMetrics : IPerformanceMetrics
 {
     public Meter Meter { get; }

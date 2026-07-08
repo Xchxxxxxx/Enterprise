@@ -33,11 +33,13 @@ public class CrudAppService<TEntity, TDto, TCreateDto, TUpdateDto>
 {
     protected readonly ISuperRepository<TEntity> _repository;
     protected readonly IMapper _mapper;
+    protected readonly ICurrentUser _currentUser;
 
-    public CrudAppService(ISuperRepository<TEntity> repository, IMapper mapper)
+    public CrudAppService(ISuperRepository<TEntity> repository, IMapper mapper, ICurrentUser currentUser)
     {
         _repository = repository;
         _mapper = mapper;
+        _currentUser = currentUser;
     }
 
     /// <summary>

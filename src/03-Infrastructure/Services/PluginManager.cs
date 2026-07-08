@@ -21,7 +21,6 @@ public interface IPlugin
     Task ShutdownAsync();
 }
 
-[Injectable(ServiceLifetime.Singleton)]
 public class PluginManager : IPluginManager
 {
     private readonly Dictionary<string, PluginLoadContext> _loadedContexts = new();
@@ -39,7 +38,7 @@ public class PluginManager : IPluginManager
 
         if (!Directory.Exists(pluginDirectory))
         {
-            _logger.LogWarning("插件目录不存�? {Path}", pluginDirectory);
+            _logger.LogWarning("插件目录不存�? {Path}", pluginDirectory);
             return assemblies;
         }
 
@@ -74,7 +73,7 @@ public class PluginManager : IPluginManager
                 {
                     await plugin.InitializeAsync();
                     _plugins.Add(plugin);
-                    _logger.LogInformation("插件已加�? {Name} v{Version}", plugin.Name, plugin.Version);
+                    _logger.LogInformation("插件已加�? {Name} v{Version}", plugin.Name, plugin.Version);
                 }
             }
 
@@ -100,7 +99,7 @@ public class PluginManager : IPluginManager
 
             context.Unload();
             _loadedContexts.Remove(pluginName);
-            _logger.LogInformation("插件已卸�? {Name}", pluginName);
+            _logger.LogInformation("插件已卸�? {Name}", pluginName);
         }
     }
 }

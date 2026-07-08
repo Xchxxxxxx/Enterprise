@@ -7,6 +7,7 @@ namespace EfCore.Enterprise.Infrastructure.Data.DomesticDatabase;
 public enum DomesticDatabaseType
 {
     SqlServer,
+    MySql,
     Dameng,
     Kingbase,
     OceanBase,
@@ -16,48 +17,30 @@ public enum DomesticDatabaseType
 
 public static class DomesticDatabaseProvider
 {
+    private static readonly HashSet<DomesticDatabaseType> MySqlCompatible = new()
+    {
+        DomesticDatabaseType.MySql,
+        DomesticDatabaseType.OceanBase,
+        DomesticDatabaseType.TiDB
+    };
+
     public static DbContextOptionsBuilder UseDomesticDatabase(
         this DbContextOptionsBuilder optionsBuilder,
         DomesticDatabaseType dbType,
         string connectionString,
         ILogger logger)
     {
-        switch (dbType)
+        if (MySqlCompatible.Contains(dbType))
         {
-            case DomesticDatabaseType.Dameng:
-                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), opts =>
-                    opts.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null));
-                logger.LogInformation("达梦数据库适配已启用");
-                break;
-
-            case DomesticDatabaseType.Kingbase:
-                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), opts =>
-                    opts.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null));
-                logger.LogInformation("人大金仓数据库适配已启用");
-                break;
-
-            case DomesticDatabaseType.OceanBase:
-                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), opts =>
-                    opts.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null));
-                logger.LogInformation("OceanBase数据库适配已启用");
-                break;
-
-            case DomesticDatabaseType.TiDB:
-                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), opts =>
-                    opts.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null));
-                logger.LogInformation("TiDB数据库适配已启用");
-                break;
-
-            case DomesticDatabaseType.GaussDB:
-                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), opts =>
-                    opts.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null));
-                logger.LogInformation("GaussDB数据库适配已启用");
-                break;
-
-            default:
-                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), opts =>
-                    opts.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null));
-                break;
+            optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), opts =>
+                opts.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null));
+            logger.LogInformation("{DbType} 数据库适配已启用（MySQL兼容模式）", dbType);
+        }
+        else
+        {
+            logger.LogWarning("{DbType} 数据库适配暂未实现，降级为MySQL兼容模式", dbType);
+            optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), opts =>
+                opts.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null));
         }
 
         return optionsBuilder;

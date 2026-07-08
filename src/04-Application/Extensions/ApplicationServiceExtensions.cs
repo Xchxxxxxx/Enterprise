@@ -1,3 +1,4 @@
+using EfCore.Enterprise.Shared.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -12,6 +13,8 @@ public static class ApplicationServiceExtensions
         this IServiceCollection services)
     {
         var assembly = Assembly.GetExecutingAssembly();
+
+        services.AddInjectables(assembly);
 
         services.AddMediatR(cfg =>
         {

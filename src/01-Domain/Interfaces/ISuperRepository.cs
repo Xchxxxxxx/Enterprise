@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using EfCore.Enterprise.Domain.Entities;
+using EfCore.Enterprise.Domain.Specifications;
 using EfCore.Enterprise.Shared.Models;
 
 namespace EfCore.Enterprise.Domain.Interfaces;
@@ -73,10 +74,32 @@ public interface ISuperRepository<TEntity> : IRepository<TEntity>
     Task ArchiveRangeAsync(
         List<long> ids,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 使用规约查询（分页）
+    /// </summary>
+    Task<PagedResult<TEntity>> QueryAsync(
+        ISpecification<TEntity> spec,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 使用规约查询（列表）
+    /// </summary>
+    Task<List<TEntity>> ListAsync(
+        ISpecification<TEntity> spec,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 使用规约查询（数量）
+    /// </summary>
+    Task<int> CountAsync(
+        ISpecification<TEntity> spec,
+        CancellationToken cancellationToken = default);
 }
 
 public interface ISuperRepository<TEntity, TKey> : IRepository<TEntity>
     where TEntity : BaseEntity<TKey>
+    where TKey : struct
 {
     Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default);
 

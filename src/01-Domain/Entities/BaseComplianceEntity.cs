@@ -1,6 +1,7 @@
 namespace EfCore.Enterprise.Domain.Entities;
 
 public abstract class BaseComplianceEntity<TKey> : BaseFullEntity<TKey>
+    where TKey : struct
 {
     public bool IsArchived { get; internal set; } = false;
     public DateTimeOffset? ArchivedTime { get; internal set; }

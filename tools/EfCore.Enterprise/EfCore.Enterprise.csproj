@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>EfCore.Enterprise</PackageId>
+    <Description>基于 DDD 的企业级 EF Core 开发框架。5 层架构、JWT 鉴权、权限管理、缓存、高可用、树形结构、操作日志、代码生成器。</Description>
+    <Version>1.0.1</Version>
+    <Authors>EfCore.Enterprise</Authors>
+    <PackageTags>efcore;ddd;enterprise;framework</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/Xchxxxxxx/Enterprise</RepositoryUrl>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>false</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\01-Domain\EfCore.Enterprise.Domain.csproj" PrivateAssets="none" />
+    <ProjectReference Include="..\..\src\02-Shared\EfCore.Enterprise.Shared.csproj" PrivateAssets="none" />
+    <ProjectReference Include="..\..\src\03-Infrastructure\EfCore.Enterprise.Infrastructure.csproj" PrivateAssets="none" />
+    <ProjectReference Include="..\..\src\04-Application\EfCore.Enterprise.Application.csproj" PrivateAssets="none" />
+  </ItemGroup>
+
+</Project>

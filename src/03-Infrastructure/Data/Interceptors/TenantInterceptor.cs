@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace EfCore.Enterprise.Infrastructure.Data.Interceptors;
 
-[Injectable(ServiceLifetime.Singleton)]
 public class TenantInterceptor : ISaveChangesInterceptor
 {
     private readonly ITenantProvider? _tenantProvider;

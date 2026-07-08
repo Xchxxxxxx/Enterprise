@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using EfCore.Enterprise.Domain.Entities;
 using EfCore.Enterprise.Domain.Interfaces;
+using EfCore.Enterprise.Domain.Specifications;
 using EfCore.Enterprise.Infrastructure.Data;
 using EfCore.Enterprise.Shared.Exceptions;
 using EfCore.Enterprise.Shared.Models;
@@ -10,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Enterprise.Infrastructure.Data;
 
-[Injectable(ServiceLifetime.Scoped)]
 public class SuperRepository<TEntity> : ISuperRepository<TEntity>
     where TEntity : BaseEntity<long>
 {
@@ -27,7 +27,7 @@ public class SuperRepository<TEntity> : ISuperRepository<TEntity>
     {
         if (typeof(BaseAuditEntity).IsAssignableFrom(typeof(TEntity)))
         {
-            return _dbSet.Where(e => !((BaseAuditEntity)(object)e).IsDeleted);
+            return _dbSet.Where(e => !EF.Property<bool>(e, "IsDeleted"));
         }
         return _dbSet;
     }
@@ -366,6 +366,71 @@ public class SuperRepository<TEntity> : ISuperRepository<TEntity>
         }
         _dbSet.UpdateRange(entities);
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public virtual async Task<PagedResult<TEntity>> QueryAsync(
+        ISpecification<TEntity> spec,
+        CancellationToken cancellationToken = default)
+    {
+        var query = ApplySpecification(spec);
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query.ToListAsync(cancellationToken);
+
+        return new PagedResult<TEntity>(
+            items,
+            totalCount,
+            spec.PageIndex ?? 1,
+            spec.PageSize ?? items.Count);
+    }
+
+    public virtual async Task<List<TEntity>> ListAsync(
+        ISpecification<TEntity> spec,
+        CancellationToken cancellationToken = default)
+    {
+        var query = ApplySpecification(spec);
+        return await query.ToListAsync(cancellationToken);
+    }
+
+    public virtual async Task<int> CountAsync(
+        ISpecification<TEntity> spec,
+        CancellationToken cancellationToken = default)
+    {
+        return await ApplySpecification(spec).CountAsync(cancellationToken);
+    }
+
+    private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec)
+    {
+        var query = Query();
+
+        if (spec.Criteria != null)
+            query = query.Where(spec.Criteria);
+
+        foreach (var include in spec.Includes)
+            query = query.Include(include);
+
+        if (spec.OrderBy != null)
+            query = query.OrderBy(spec.OrderBy);
+
+        if (spec.OrderByDescending != null)
+            query = query.OrderByDescending(spec.OrderByDescending);
+
+        if (spec.ThenBy != null)
+            query = ((IOrderedQueryable<TEntity>)query).ThenBy(spec.ThenBy);
+
+        if (spec.ThenByDescending != null)
+            query = ((IOrderedQueryable<TEntity>)query).ThenByDescending(spec.ThenByDescending);
+
+        if (spec.Skip.HasValue)
+            query = query.Skip(spec.Skip.Value);
+
+        if (spec.Take.HasValue)
+            query = query.Take(spec.Take.Value);
+
+        if (spec.PageIndex.HasValue && spec.PageSize.HasValue)
+            query = query.Skip((spec.PageIndex.Value - 1) * spec.PageSize.Value).Take(spec.PageSize.Value);
+
+        return query;
     }
 
     public virtual async Task<int> SaveChangesAsync(

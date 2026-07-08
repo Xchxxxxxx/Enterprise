@@ -27,6 +27,9 @@ logs/
 .idea/
 *.sln.iml
 
+# Docs
+docs/node_modules/
+
 # VS Code
 .vscode/
 

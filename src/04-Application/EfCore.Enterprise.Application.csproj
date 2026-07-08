@@ -4,9 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>EfCore.Enterprise.Application</PackageId>
+    <Description>应用层：CRUD 服务基类、控制器基类、AutoMapper 配置、FluentValidation 校验、操作日志</Description>
     <RootNamespace>EfCore.Enterprise.Application</RootNamespace>
     <AssemblyName>EfCore.Enterprise.Application</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
@@ -14,6 +20,7 @@
     <PackageReference Include="FluentValidation" Version="11.9.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="MediatR" Version="12.2.0" />
   </ItemGroup>
 
   <ItemGroup>

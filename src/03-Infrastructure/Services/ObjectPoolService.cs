@@ -11,7 +11,6 @@ public interface IObjectPoolService
     void Return<T>(T obj) where T : class, new();
 }
 
-[Injectable(ServiceLifetime.Singleton)]
 public class ObjectPoolService : IObjectPoolService
 {
     private readonly ConcurrentDictionary<Type, object> _pools = new();

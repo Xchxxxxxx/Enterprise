@@ -16,7 +16,6 @@ public interface ICacheService
     Task WarmUpAsync<T>(string key, Func<Task<T>> factory, CancellationToken ct = default);
 }
 
-[Injectable(ServiceLifetime.Scoped)]
 public class CacheService : ICacheService
 {
     private readonly IDistributedCache _cache;

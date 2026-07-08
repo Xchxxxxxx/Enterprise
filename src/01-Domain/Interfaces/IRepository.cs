@@ -54,6 +54,7 @@ public interface IRepository<TEntity> where TEntity : class
 
 public interface IRepository<TEntity, TKey> : IRepository<TEntity>
     where TEntity : BaseEntity<TKey>
+    where TKey : struct
 {
     Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default);
 

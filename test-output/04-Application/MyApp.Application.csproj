@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>MyApp.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EfCore.Enterprise.Application" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\01-Domain\MyApp.Domain.csproj" />
+    <ProjectReference Include="..\02-Shared\MyApp.Shared.csproj" />
+    <ProjectReference Include="..\03-Contracts\MyApp.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace EfCore.Enterprise.Infrastructure.Data.Optimization;
 
-[Injectable(ServiceLifetime.Singleton)]
 public class QueryPrecompilationCache
 {
     private readonly ConcurrentDictionary<string, object> _compiledQueries = new();

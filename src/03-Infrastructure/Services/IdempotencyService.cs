@@ -12,7 +12,6 @@ public interface IIdempotencyService
     Task<string> GenerateIdempotencyKeyAsync(string data, CancellationToken ct = default);
 }
 
-[Injectable(ServiceLifetime.Scoped)]
 public class IdempotencyService : IIdempotencyService
 {
     private readonly IDistributedCache _cache;
@@ -37,7 +36,7 @@ public class IdempotencyService : IIdempotencyService
             AbsoluteExpirationRelativeToNow = ttl ?? TimeSpan.FromHours(24)
         };
         await _cache.SetStringAsync(key, "PROCESSED", options, ct);
-        _logger.LogDebug("幂等标记已设�? {Key}", key);
+        _logger.LogDebug("幂等标记已设�? {Key}", key);
     }
 
     public Task<string> GenerateIdempotencyKeyAsync(string data, CancellationToken ct = default)

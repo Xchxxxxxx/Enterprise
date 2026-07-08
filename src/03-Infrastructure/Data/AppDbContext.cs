@@ -8,6 +8,10 @@ namespace EfCore.Enterprise.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {
+    protected AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+    {
+    }
     private readonly AuditInterceptor _auditInterceptor;
     private readonly SoftDeleteInterceptor _softDeleteInterceptor;
     private readonly TenantInterceptor _tenantInterceptor;
@@ -15,7 +19,7 @@ public class AppDbContext : DbContext
     private readonly IDomainEventBus _domainEventBus;
 
     public AppDbContext(
-        DbContextOptions<AppDbContext> options,
+        DbContextOptions options,
         AuditInterceptor auditInterceptor,
         SoftDeleteInterceptor softDeleteInterceptor,
         TenantInterceptor tenantInterceptor,

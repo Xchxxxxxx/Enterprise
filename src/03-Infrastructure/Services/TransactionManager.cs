@@ -9,7 +9,6 @@ public interface ITransactionManager
     Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> action, CancellationToken ct = default);
 }
 
-[Injectable(ServiceLifetime.Scoped)]
 public class TransactionManager : ITransactionManager
 {
     private readonly IUnitOfWork _unitOfWork;

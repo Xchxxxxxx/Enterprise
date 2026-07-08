@@ -21,7 +21,6 @@ public enum AlertLevel
     Critical
 }
 
-[Injectable(ServiceLifetime.Singleton)]
 public class AlertService : IAlertService
 {
     private readonly ILogger<AlertService> _logger;

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EfCore.Enterprise.Infrastructure.Data;
 
-[Injectable(ServiceLifetime.Scoped)]
 public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;

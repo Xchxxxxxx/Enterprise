@@ -18,7 +18,6 @@ public interface IBackgroundJobService
     bool Requeue(string jobId);
 }
 
-[Injectable(ServiceLifetime.Scoped, ExposeAs = typeof(IBackgroundJobService))]
 public class HangfireJobService : IBackgroundJobService
 {
     private readonly ILogger<HangfireJobService> _logger;

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace EfCore.Enterprise.Infrastructure.Services;
 
-[Injectable(ServiceLifetime.Scoped, ExposeAs = typeof(IDomainEventBus))]
+[Injectable(ServiceLifetime.Singleton, ExposeAs = typeof(IDomainEventBus))]
 public class MediatorDomainEventBus : IDomainEventBus
 {
     private readonly IMediator _mediator;

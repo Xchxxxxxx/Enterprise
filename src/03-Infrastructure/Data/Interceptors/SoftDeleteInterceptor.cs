@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace EfCore.Enterprise.Infrastructure.Data.Interceptors;
 
-[Injectable(ServiceLifetime.Singleton)]
 public class SoftDeleteInterceptor : ISaveChangesInterceptor
 {
     public InterceptionResult<int> SavingChanges(

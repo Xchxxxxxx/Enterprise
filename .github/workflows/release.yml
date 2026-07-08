@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore EfCore.Enterprise.sln
+
+      - name: Build
+        run: dotnet build EfCore.Enterprise.sln -c Release --no-restore
+
+      - name: Pack
+        run: |
+          dotnet pack EfCore.Enterprise.sln -c Release --no-build -o nupkgs
+          dotnet pack tools/EfCore.Enterprise/EfCore.Enterprise.csproj -c Release --no-build -o nupkgs
+          dotnet pack tools/EfCore.Enterprise.Templates/EfCore.Enterprise.Templates.csproj -c Release --no-build -o nupkgs
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: nupkgs/*.nupkg
+          generate_release_notes: true

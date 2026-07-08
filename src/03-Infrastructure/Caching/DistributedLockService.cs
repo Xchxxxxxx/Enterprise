@@ -10,7 +10,6 @@ public interface IDistributedLockService
     Task ReleaseAsync(LockHandle handle);
 }
 
-[Injectable(ServiceLifetime.Scoped)]
 public class DistributedLockService : IDistributedLockService
 {
     private readonly IConnectionMultiplexer? _redis;

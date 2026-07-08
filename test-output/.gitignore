@@ -1,0 +1,42 @@
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+x64/
+x86/
+build/
+out/
+
+# NuGet
+*.nupkg
+.nuget/
+packages/
+
+# User files
+*.log
+*.tmp
+.cache/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Node.js
+node_modules/
+
+# Test results
+TestResults/
+*.trx
+
+# Publish
+publish/

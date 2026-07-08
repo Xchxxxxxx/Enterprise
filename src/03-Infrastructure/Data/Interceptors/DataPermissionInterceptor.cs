@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace EfCore.Enterprise.Infrastructure.Data.Interceptors;
 
-[Injectable(ServiceLifetime.Singleton)]
 public class DataPermissionInterceptor : ISaveChangesInterceptor
 {
     private readonly IDataPermissionProvider? _permissionProvider;

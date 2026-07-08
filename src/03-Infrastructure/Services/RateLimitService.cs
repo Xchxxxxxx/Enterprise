@@ -12,7 +12,6 @@ public interface IRateLimitService
     Task AddToBlacklistAsync(string ip, TimeSpan duration, CancellationToken ct = default);
 }
 
-[Injectable(ServiceLifetime.Singleton)]
 public class RateLimitService : IRateLimitService
 {
     private readonly ConcurrentDictionary<string, RateLimitEntry> _counters = new();
@@ -45,7 +44,7 @@ public class RateLimitService : IRateLimitService
 
             if (entry.Count > maxRequests)
             {
-                _logger.LogWarning("限流触发: {Key}, 请求�? {Count}", key, entry.Count);
+                _logger.LogWarning("限流触发: {Key}, 请求�? {Count}", key, entry.Count);
                 return Task.FromResult(false);
             }
         }
