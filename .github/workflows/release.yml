@@ -28,7 +28,9 @@ jobs:
       - name: Pack
         run: |
           dotnet pack EfCore.Enterprise.sln -c Release --no-build -o nupkgs
+          dotnet build tools/EfCore.Enterprise/EfCore.Enterprise.csproj -c Release
           dotnet pack tools/EfCore.Enterprise/EfCore.Enterprise.csproj -c Release --no-build -o nupkgs
+          dotnet build tools/EfCore.Enterprise.Templates/EfCore.Enterprise.Templates.csproj -c Release
           dotnet pack tools/EfCore.Enterprise.Templates/EfCore.Enterprise.Templates.csproj -c Release --no-build -o nupkgs
 
       - name: Release
