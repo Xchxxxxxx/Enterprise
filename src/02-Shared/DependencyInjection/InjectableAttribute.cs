@@ -23,7 +23,7 @@ public class InjectableAttribute : Attribute
     /// <summary>
     /// 服务生命周期
     /// </summary>
-    public ServiceLifetime Lifetime { get; }
+    public ServiceLifetime Lifetime { get; set; }
 
     /// <summary>
     /// 指定暴露给DI的接口类型，不指定则自动匹配 I{ClassName} 接口
