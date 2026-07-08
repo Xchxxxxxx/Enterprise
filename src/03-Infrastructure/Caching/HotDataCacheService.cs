@@ -15,6 +15,7 @@ public interface IHotDataCacheService
 
 public class HotDataCacheService : IHotDataCacheService
 {
+    private const int MaxCacheEntries = 10000;
     private readonly ConcurrentDictionary<string, CacheEntry> _cache = new();
     private readonly ILogger<HotDataCacheService> _logger;
     private readonly Timer _cleanupTimer;
@@ -41,6 +42,11 @@ public class HotDataCacheService : IHotDataCacheService
 
     public void Set<T>(string key, T value, TimeSpan? expiry = null)
     {
+        if (_cache.Count >= MaxCacheEntries && !_cache.ContainsKey(key))
+        {
+            _logger.LogWarning("热点缓存达到容量上限 {MaxCount}，跳过写入 {Key}", MaxCacheEntries, key);
+            return;
+        }
         var expireAt = expiry.HasValue ? DateTime.UtcNow.Add(expiry.Value) : (DateTime?)null;
         _cache[key] = new CacheEntry(value!, expireAt);
     }

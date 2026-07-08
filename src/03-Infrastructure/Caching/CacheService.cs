@@ -96,6 +96,7 @@ public class CacheService : ICacheService
         finally
         {
             lockSem.Release();
+            _locks.TryRemove(key, out _);
         }
     }
 

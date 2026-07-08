@@ -28,6 +28,8 @@ public class NPlusOneInterceptor : DbCommandInterceptor
         return new ValueTask<InterceptionResult<DbDataReader>>(result);
     }
 
+    private const int MaxTrackedQueries = 500;
+
     private void TrackQuery(DbCommand command)
     {
         var sql = command.CommandText.Trim();
@@ -41,6 +43,11 @@ public class NPlusOneInterceptor : DbCommandInterceptor
             }
             else
             {
+                if (_queryCounts.Count >= MaxTrackedQueries)
+                {
+                    _logger.LogWarning("N+1检测达到容量上限 {MaxCount}，跳过新SQL模式追踪", MaxTrackedQueries);
+                    return;
+                }
                 _queryCounts[normalized] = 1;
             }
 

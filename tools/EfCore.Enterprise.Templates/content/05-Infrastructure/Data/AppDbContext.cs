@@ -1,7 +1,6 @@
 using EfCore.Enterprise.Infrastructure.Data;
 using EfCore.Enterprise.Infrastructure.Data.Interceptors;
 using EfCore.Enterprise.Domain.Events;
-using CompanyName.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CompanyName.Infrastructure.Data;

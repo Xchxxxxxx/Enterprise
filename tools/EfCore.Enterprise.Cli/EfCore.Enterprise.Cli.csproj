@@ -16,7 +16,7 @@
     <Authors>EfCore.Enterprise</Authors>
     <PackageTags>efcore;cli;codegen;ddd</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/Xchxxxxxx/ddd</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Xchxxxxxx/Enterprise</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

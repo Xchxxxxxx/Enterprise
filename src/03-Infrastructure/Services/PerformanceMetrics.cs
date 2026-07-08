@@ -1,4 +1,5 @@
 using EfCore.Enterprise.Shared.DependencyInjection;
+using System.Collections.Concurrent;
 using System.Diagnostics.Metrics;
 
 namespace EfCore.Enterprise.Infrastructure.Services;
@@ -23,6 +24,7 @@ public class PerformanceMetrics : IPerformanceMetrics
     private readonly Counter<long> _cacheHits;
     private readonly Counter<long> _cacheMisses;
     private readonly Counter<long> _errorCount;
+    private readonly ConcurrentDictionary<string, double> _gauges = new();
 
     public PerformanceMetrics()
     {
@@ -83,6 +85,7 @@ public class PerformanceMetrics : IPerformanceMetrics
 
     public void SetGauge(string name, double value)
     {
-        var observableGauge = Meter.CreateObservableGauge($"efcore.{name}", () => value);
+        _gauges[name] = value;
+        Meter.CreateObservableGauge($"efcore.{name}", () => _gauges.TryGetValue(name, out var v) ? v : 0);
     }
 }

@@ -15,12 +15,16 @@ public interface IDeadLetterQueueService
 
 public class DeadLetterQueueService : IDeadLetterQueueService
 {
+    private const int MaxMessagesPerQueue = 1000;
+    private static readonly TimeSpan MessageTtl = TimeSpan.FromHours(24);
     private readonly ConcurrentDictionary<string, ConcurrentQueue<DeadLetterMessage>> _queues = new();
     private readonly ILogger<DeadLetterQueueService> _logger;
+    private readonly Timer _cleanupTimer;
 
     public DeadLetterQueueService(ILogger<DeadLetterQueueService> logger)
     {
         _logger = logger;
+        _cleanupTimer = new Timer(CleanupExpired, null, TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(30));
     }
 
     public Task EnqueueAsync<T>(string queueName, T message, string? errorMessage = null)
@@ -36,6 +40,12 @@ public class DeadLetterQueueService : IDeadLetterQueueService
             Payload = message!
         };
         queue.Enqueue(deadMessage);
+
+        while (queue.Count > MaxMessagesPerQueue)
+        {
+            queue.TryDequeue(out _);
+        }
+
         _logger.LogWarning("死信队列 {QueueName} 新增消息 {MessageId}", queueName, deadMessage.MessageId);
         return Task.CompletedTask;
     }
@@ -67,6 +77,21 @@ public class DeadLetterQueueService : IDeadLetterQueueService
         }
         _logger.LogInformation("死信消息 {MessageId} 已丢弃", messageId);
         return Task.CompletedTask;
+    }
+
+    private void CleanupExpired(object? state)
+    {
+        var cutoff = DateTime.UtcNow - MessageTtl;
+        foreach (var kvp in _queues)
+        {
+            var remaining = kvp.Value.Where(m => m.EnqueuedAt > cutoff).ToList();
+            _queues[kvp.Key] = new ConcurrentQueue<DeadLetterMessage>(remaining);
+        }
+        var emptyQueues = _queues.Where(kvp => kvp.Value.IsEmpty).Select(kvp => kvp.Key).ToList();
+        foreach (var key in emptyQueues)
+        {
+            _queues.TryRemove(key, out _);
+        }
     }
 
     private class DeadLetterMessage

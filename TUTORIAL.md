@@ -80,7 +80,37 @@ BaseEntity<TKey>              基础实体 (Id, 雪花ID)
 
 ## 3. 安装框架
 
-### 3.1 打包框架（开发环境）
+### 3.1 从 GitHub 下载安装（推荐）
+
+框架已发布到 GitHub Releases，一个命令即可安装：
+
+```powershell
+# 下载模板包
+curl -L -o EfCore.Enterprise.Templates.1.0.1.nupkg --ssl-no-revoke "https://github.com/Xchxxxxxx/Enterprise/releases/download/v1.0.1/EfCore.Enterprise.Templates.1.0.1.nupkg"
+
+# 安装模板
+dotnet new install EfCore.Enterprise.Templates.1.0.1.nupkg
+
+# 创建项目（模板自带框架包，无需额外配置）
+dotnet new ef-enterprise -n MyProject --database mysql
+```
+
+> **说明**：模板 `local-packages` 目录已内置框架 NuGet 包，项目的 `nuget.config` 自动指向 `./local-packages`，无论模板装在哪里都能正确引用。
+
+### 3.2 安装 CLI 工具
+
+```powershell
+# 下载 CLI 工具包
+curl -L -o EfCore.Enterprise.1.0.1.nupkg --ssl-no-revoke "https://github.com/Xchxxxxxx/Enterprise/releases/download/v1.0.1/EfCore.Enterprise.1.0.1.nupkg"
+
+# 安装 CLI 工具
+dotnet tool install -g EfCore.Enterprise.Cli --add-source "."
+
+# 验证
+ef-cli help
+```
+
+### 3.3 打包框架（本地开发）
 
 框架源码位于 `src/` 目录，修改后需重新打包：
 
@@ -92,7 +122,7 @@ dotnet pack "tools\EfCore.Enterprise\EfCore.Enterprise.csproj" -c Release -o "nu
 dotnet pack "tools\EfCore.Enterprise.Templates\EfCore.Enterprise.Templates.csproj" -c Release -o "nupkgs"
 ```
 
-### 3.1.1 更新已有项目的 NuGet 包
+### 3.4 更新已有项目的 NuGet 包
 
 如果你已经有一个基于本框架的项目，修改框架源码后需要按以下步骤更新：
 
@@ -116,7 +146,7 @@ dotnet build
 
 > **最佳实践**：每次修改框架后，在 `src/Directory.Build.props` 中升级版本号（从 1.0.1 → 1.0.2...），然后重新打包。这样可以彻底避免缓存问题，所有项目能立即获取最新版本。
 
-### 3.2 安装框架包
+### 3.5 安装框架包
 
 ```bash
 # 从本地 nupkgs 目录安装（推荐）
@@ -129,14 +159,14 @@ dotnet add package EfCore.Enterprise.Application -s "d:\自建\项目\ef\nupkgs"
 dotnet add package EfCore.Enterprise -s "d:\自建\项目\ef\nupkgs"
 ```
 
-### 3.3 安装项目模板
+### 3.6 安装项目模板（本地开发）
 
 ```bash
 # 安装模板（从本地 nupkg 文件）
 dotnet new install "d:\自建\项目\ef\nupkgs\EfCore.Enterprise.Templates.1.0.1.nupkg"
 ```
 
-### 3.4 安装 CLI 工具
+### 3.7 安装 CLI 工具（本地开发）
 
 ```bash
 # 全局安装
@@ -1213,6 +1243,61 @@ var count = await _repository.CountAsync(spec);
 | `.Page(index, size)` | 分页 |
 | `.Include(expr)` | 贪婪加载导航属性 |
 
+### 16.9 内存保护机制
+
+框架所有 Singleton 服务均内置**容量上限 + 定时清理**，杜绝内存泄漏：
+
+| 服务 | 上限 | 清理策略 |
+|------|------|----------|
+| `PerformanceMonitor` | 500 接口 / 1000 SQL | 环形队列，满时移除最旧 |
+| `DeadLetterQueueService` | 1000条/队列 | 30分钟定时清理 24h 过期消息 |
+| `HotDataCacheService` | 10000条 | 5分钟定时清理过期缓存 |
+| `CacheService` | - | 工厂返回后立即释放锁信号量 |
+| `NPlusOneInterceptor` | 500条SQL模式 | 超限跳过新追踪 |
+| `PerformanceMetrics` | - | Gauge 复用，不重复创建 |
+
+> 这些限制在调试和生产环境均生效，确保长时间运行不会耗尽内存。
+
+### 16.10 自动依赖注入
+
+在任意类上标记 `[Injectable]` 特性，框架自动扫描并注册到 DI 容器：
+
+```csharp
+using EfCore.Enterprise.Shared.DependencyInjection;
+
+// Singleton 自动注册
+[Injectable(ServiceLifetime.Singleton)]
+public class MyHelperService
+{
+    public string DoWork() => "done";
+}
+
+// Scoped 自动注册
+[Injectable(ServiceLifetime.Scoped)]
+public class MyScopedService
+{
+}
+
+// Transient 自动注册
+[Injectable(ServiceLifetime.Transient)]
+public class MyTransientService
+{
+}
+
+// 在 Program.cs 中传入扫描程序集
+var projectAssemblies = new[]
+{
+    typeof(BaseEntity).Assembly,           // 框架
+    typeof(MyDomainEntity).Assembly,       // 领域层
+    typeof(MyDbContext).Assembly,          // 基础设施层
+    typeof(MyService).Assembly,            // 应用层
+    typeof(Program).Assembly               // 表现层
+};
+builder.Services.AddEfCoreAutoInject(projectAssemblies);
+```
+
+> **注意**：继承 `BaseService` 或 `CrudAppService` 的类已自动获得 `ICurrentUser`，无需手动注入。
+
 ---
 
 ## 附录
@@ -1233,6 +1318,16 @@ var count = await _repository.CountAsync(spec);
 ### B. 常用命令速查
 
 ```bash
+# 从 GitHub 下载安装
+curl -L -o EfCore.Enterprise.Templates.1.0.1.nupkg --ssl-no-revoke "https://github.com/Xchxxxxxx/Enterprise/releases/download/v1.0.1/EfCore.Enterprise.Templates.1.0.1.nupkg"
+dotnet new install EfCore.Enterprise.Templates.1.0.1.nupkg
+dotnet new ef-enterprise -n MyProject --database mysql
+
+# 安装 CLI 工具
+curl -L -o EfCore.Enterprise.1.0.1.nupkg --ssl-no-revoke "https://github.com/Xchxxxxxx/Enterprise/releases/download/v1.0.1/EfCore.Enterprise.1.0.1.nupkg"
+dotnet tool install -g EfCore.Enterprise.Cli --add-source "."
+ef-cli help
+
 # 框架打包
 dotnet build EfCore.Enterprise.sln -c Release
 dotnet pack EfCore.Enterprise.sln -c Release -o nupkgs
@@ -1279,17 +1374,22 @@ throw new UnauthorizedException("未授权访问");
 
 ### D. 依赖注入服务清单
 
-| 服务 | 生命周期 | 说明 |
-|------|----------|------|
-| `ISuperRepository<T>` | Scoped | 泛型仓储（CRUD + 分页） |
-| `ITreeRepository<T>` | Scoped | 树形仓储（树查询、移动节点） |
-| `IUnitOfWork` | Scoped | 工作单元（事务管理） |
-| `ICacheService` | Scoped | 缓存服务（Memory/Redis） |
-| `IDistributedLockService` | Scoped | 分布式锁 |
-| `IJwtService` | Singleton | JWT令牌生成与验证 |
-| `IDomainEventBus` | Singleton | 领域事件总线（MediatR） |
-| `IOpLogService` | Scoped | 操作日志服务 |
-| `DevModeService` | Singleton | 开发模式（自动迁移/种子数据） |
-| `GrayReleaseRuleManager` | Singleton | 灰度发布规则管理 |
-| `DataSeeder` | Singleton | 种子数据初始化 |
-| `TransactionManager` | Scoped | 事务管理器（封装提交/回滚） |
+| 服务 | 生命周期 | 内存保护 | 说明 |
+|------|----------|----------|------|
+| `ISuperRepository<T>` | Scoped | 请求结束自动释放 | 泛型仓储（CRUD + 分页） |
+| `ITreeRepository<T>` | Scoped | 请求结束自动释放 | 树形仓储（树查询、移动节点） |
+| `IUnitOfWork` | Scoped | 请求结束自动释放 | 工作单元（事务管理） |
+| `ICacheService` | Scoped | 锁释放后清空 | 缓存服务（Memory/Redis） |
+| `IDistributedLockService` | Scoped | 请求结束自动释放 | 分布式锁 |
+| `IJwtService` | Singleton | 无状态 | JWT令牌生成与验证 |
+| `IDomainEventBus` | Singleton | 无状态 | 领域事件总线（MediatR） |
+| `IOpLogService` | Scoped | 请求结束自动释放 | 操作日志服务 |
+| `ICurrentUser` | Scoped | 请求结束自动释放 | 当前用户信息 |
+| `IPerformanceMonitor` | Singleton | 500接口/1000SQL | 性能监控 |
+| `IDeadLetterQueueService` | Singleton | 1000条/队列+24h TTL | 死信队列 |
+| `IHotDataCacheService` | Singleton | 10000条 | 热点数据缓存 |
+| `IRateLimitService` | Singleton | 按窗口过期 | 限流服务 |
+| `DevModeService` | Singleton | 无状态 | 开发模式（自动迁移/种子数据） |
+| `GrayReleaseRuleManager` | Singleton | 规则数量 | 灰度发布规则管理 |
+| `DataSeeder` | Singleton | 无状态 | 种子数据初始化 |
+| `TransactionManager` | Scoped | 请求结束自动释放 | 事务管理器（封装提交/回滚） |

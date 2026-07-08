@@ -1,9 +1,0 @@
-bin\
-obj\
-.git\
-.vs\
-.vscode\
-.trae\
-node_modules\
-*.user
-Thumbs.db
