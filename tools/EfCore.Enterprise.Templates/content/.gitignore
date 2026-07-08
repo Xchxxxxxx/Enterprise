@@ -17,6 +17,7 @@ out/
 
 # NuGet
 *.nupkg
+!local-packages/*.nupkg
 .nuget/
 packages/
 

@@ -25,9 +25,19 @@ jobs:
       - name: Build
         run: dotnet build EfCore.Enterprise.sln -c Release --no-restore
 
-      - name: Pack
+      - name: Pack Framework
+        run: dotnet pack EfCore.Enterprise.sln -c Release --no-build -o nupkgs
+
+      - name: Copy Framework Packages to Template
         run: |
-          dotnet pack EfCore.Enterprise.sln -c Release --no-build -o nupkgs
+          mkdir -p tools/EfCore.Enterprise.Templates/content/local-packages
+          cp nupkgs/EfCore.Enterprise.Domain.1.0.1.nupkg tools/EfCore.Enterprise.Templates/content/local-packages/
+          cp nupkgs/EfCore.Enterprise.Shared.1.0.1.nupkg tools/EfCore.Enterprise.Templates/content/local-packages/
+          cp nupkgs/EfCore.Enterprise.Application.1.0.1.nupkg tools/EfCore.Enterprise.Templates/content/local-packages/
+          cp nupkgs/EfCore.Enterprise.Infrastructure.1.0.1.nupkg tools/EfCore.Enterprise.Templates/content/local-packages/
+
+      - name: Pack Tools
+        run: |
           dotnet build tools/EfCore.Enterprise/EfCore.Enterprise.csproj -c Release
           dotnet pack tools/EfCore.Enterprise/EfCore.Enterprise.csproj -c Release --no-build -o nupkgs
           dotnet build tools/EfCore.Enterprise.Templates/EfCore.Enterprise.Templates.csproj -c Release
