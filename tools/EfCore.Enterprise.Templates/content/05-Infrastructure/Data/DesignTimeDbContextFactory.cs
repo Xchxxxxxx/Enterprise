@@ -22,7 +22,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
         var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("在 appsettings.json 中找不到 connectionString DefaultConnection");
 
-        var optionsBuilder = new DbContextOptionsBuilder<EfCore.Enterprise.Infrastructure.Data.AppDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
         optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), sqlOptions =>
         {

@@ -9,7 +9,7 @@ public class AppDbContext : EfCore.Enterprise.Infrastructure.Data.AppDbContext
 {
 
     public AppDbContext(
-        DbContextOptions<EfCore.Enterprise.Infrastructure.Data.AppDbContext> options,
+        DbContextOptions<AppDbContext> options,
         AuditInterceptor auditInterceptor,
         SoftDeleteInterceptor softDeleteInterceptor,
         TenantInterceptor tenantInterceptor,
