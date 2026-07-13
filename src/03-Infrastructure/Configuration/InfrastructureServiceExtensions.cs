@@ -31,6 +31,8 @@ public static class InfrastructureServiceExtensions
 
         services.AddDbContext<AppDbContext>(ConfigureDbContext(typeof(AppDbContext), connectionString));
 
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         return services;
     }
 
@@ -50,6 +52,9 @@ public static class InfrastructureServiceExtensions
         services.AddDbContext<TContext>(ConfigureDbContext(typeof(TContext), connectionString));
 
         services.AddScoped<AppDbContext>(sp => sp.GetRequiredService<TContext>());
+
+        services.AddScoped<IUnitOfWork>(sp => new UnitOfWork(sp.GetRequiredService<TContext>()));
+        services.AddScoped<IUnitOfWork<TContext>>(sp => new UnitOfWork<TContext>(sp.GetRequiredService<TContext>()));
 
         return services;
     }

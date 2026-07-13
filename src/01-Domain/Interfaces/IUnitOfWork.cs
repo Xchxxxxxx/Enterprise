@@ -10,3 +10,9 @@ public interface IUnitOfWork : IDisposable
 
     Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
 }
+
+public interface IUnitOfWork<TContext> : IUnitOfWork
+    where TContext : class
+{
+    TContext Context { get; }
+}

@@ -4,28 +4,32 @@ using FluentValidation;
 
 namespace EfCore.Enterprise.Application.Services;
 
-public abstract class BaseService
+public abstract class BaseService<TContext>
+    where TContext : class
 {
-    protected readonly IUnitOfWork UnitOfWork;
+    protected readonly IUnitOfWork<TContext> UnitOfWork;
     protected readonly IMapper Mapper;
     protected readonly ICurrentUser CurrentUser;
+    protected readonly TContext Context;
 
-    protected BaseService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUser currentUser)
+    protected BaseService(IUnitOfWork<TContext> unitOfWork, IMapper mapper, ICurrentUser currentUser)
     {
         UnitOfWork = unitOfWork;
         Mapper = mapper;
         CurrentUser = currentUser;
+        Context = unitOfWork.Context;
     }
 }
 
-public abstract class BaseService<TEntity, TDto, TCreateDto, TUpdateDto> : BaseService
+public abstract class BaseService<TEntity, TDto, TCreateDto, TUpdateDto, TContext> : BaseService<TContext>
     where TEntity : class
+    where TContext : class
 {
     protected readonly ISuperRepository<TEntity> Repository;
 
     protected BaseService(
         ISuperRepository<TEntity> repository,
-        IUnitOfWork unitOfWork,
+        IUnitOfWork<TContext> unitOfWork,
         IMapper mapper,
         ICurrentUser currentUser)
         : base(unitOfWork, mapper, currentUser)
