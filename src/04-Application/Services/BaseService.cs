@@ -13,7 +13,7 @@ public abstract class BaseService<TContext>
     protected readonly TContext Context;
 
     protected BaseService(IUnitOfWork<TContext> unitOfWork, IMapper mapper, ICurrentUser currentUser)
-    {
+    {   
         UnitOfWork = unitOfWork;
         Mapper = mapper;
         CurrentUser = currentUser;
