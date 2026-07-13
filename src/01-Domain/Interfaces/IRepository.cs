@@ -16,8 +16,26 @@ public interface IRepository<TEntity> where TEntity : class
         Expression<Func<TEntity, bool>> predicate,
         CancellationToken cancellationToken = default);
 
+    Task<List<TEntity>> GetSortedListAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<TEntity, object>> orderBy,
+        bool ascending = true,
+        CancellationToken cancellationToken = default);
+
+    Task<List<TEntity>> GetSortedListAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        string sortField,
+        bool ascending = true,
+        CancellationToken cancellationToken = default);
+
     Task<TEntity?> FirstOrDefaultAsync(
         Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default);
+
+    Task<TEntity?> FirstOrDefaultSortedAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<TEntity, object>> orderBy,
+        bool ascending = true,
         CancellationToken cancellationToken = default);
 
     Task<bool> AnyAsync(
@@ -31,6 +49,14 @@ public interface IRepository<TEntity> where TEntity : class
     Task<PagedResult<TEntity>> GetPagedAsync(
         Expression<Func<TEntity, bool>> predicate,
         PagedRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<PagedResult<TEntity>> GetPagedSortedAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<TEntity, object>> orderBy,
+        bool ascending,
+        int pageIndex,
+        int pageSize,
         CancellationToken cancellationToken = default);
 
     Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default);

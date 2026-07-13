@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using EfCore.Enterprise.Shared.DependencyInjection;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -14,6 +15,8 @@ namespace EfCore.Enterprise.Infrastructure.Data;
 public class SuperRepository<TEntity> : ISuperRepository<TEntity>
     where TEntity : BaseEntity<long>
 {
+    private static readonly ConcurrentDictionary<string, Delegate> _sortCache = new();
+
     protected readonly AppDbContext _context;
     protected readonly DbSet<TEntity> _dbSet;
 
@@ -54,11 +57,44 @@ public class SuperRepository<TEntity> : ISuperRepository<TEntity>
         return await Query().Where(predicate).ToListAsync(cancellationToken);
     }
 
+    public virtual async Task<List<TEntity>> GetSortedListAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<TEntity, object>> orderBy,
+        bool ascending = true,
+        CancellationToken cancellationToken = default)
+    {
+        var query = Query().Where(predicate);
+        query = ascending ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
+        return await query.ToListAsync(cancellationToken);
+    }
+
+    public virtual async Task<List<TEntity>> GetSortedListAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        string sortField,
+        bool ascending = true,
+        CancellationToken cancellationToken = default)
+    {
+        var query = Query().Where(predicate);
+        query = ApplySorting(query, sortField, ascending);
+        return await query.ToListAsync(cancellationToken);
+    }
+
     public virtual async Task<TEntity?> FirstOrDefaultAsync(
         Expression<Func<TEntity, bool>> predicate,
         CancellationToken cancellationToken = default)
     {
         return await Query().FirstOrDefaultAsync(predicate, cancellationToken);
+    }
+
+    public virtual async Task<TEntity?> FirstOrDefaultSortedAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<TEntity, object>> orderBy,
+        bool ascending = true,
+        CancellationToken cancellationToken = default)
+    {
+        var query = Query().Where(predicate);
+        query = ascending ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public virtual async Task<bool> AnyAsync(
@@ -94,6 +130,27 @@ public class SuperRepository<TEntity> : ISuperRepository<TEntity>
             .ToListAsync(cancellationToken);
 
         return new PagedResult<TEntity>(items, totalCount, request.PageIndex, request.PageSize);
+    }
+
+    public virtual async Task<PagedResult<TEntity>> GetPagedSortedAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<TEntity, object>> orderBy,
+        bool ascending,
+        int pageIndex,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var query = Query().Where(predicate);
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        query = ascending ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
+
+        var items = await query
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<TEntity>(items, totalCount, pageIndex, pageSize);
     }
 
     public virtual async Task<PagedResult<TEntity>> GetPagedWithCursorAsync(
@@ -444,16 +501,26 @@ public class SuperRepository<TEntity> : ISuperRepository<TEntity>
         string sortField,
         bool isAscending)
     {
+        var cacheKey = $"{typeof(TEntity).FullName}.{sortField}.{(isAscending ? "asc" : "desc")}";
+
+        if (_sortCache.TryGetValue(cacheKey, out var cached))
+            return ((Func<IQueryable<TEntity>, IQueryable<TEntity>>)cached)(query);
+
         var parameter = Expression.Parameter(typeof(TEntity), "e");
         var property = Expression.Property(parameter, sortField);
         var lambda = Expression.Lambda(property, parameter);
         var methodName = isAscending ? "OrderBy" : "OrderByDescending";
 
-        var result = typeof(Queryable).GetMethods()
+        var method = typeof(Queryable).GetMethods()
             .First(m => m.Name == methodName && m.GetParameters().Length == 2)
-            .MakeGenericMethod(typeof(TEntity), property.Type)
-            .Invoke(null, new object[] { query, lambda });
+            .MakeGenericMethod(typeof(TEntity), property.Type);
 
-        return (IQueryable<TEntity>)result!;
+        var queryParam = Expression.Parameter(typeof(IQueryable<TEntity>), "q");
+        var call = Expression.Call(method, queryParam, Expression.Quote(lambda));
+        var compiled = Expression.Lambda<Func<IQueryable<TEntity>, IQueryable<TEntity>>>(call, queryParam).Compile();
+
+        _sortCache.TryAdd(cacheKey, compiled);
+
+        return compiled(query);
     }
 }
