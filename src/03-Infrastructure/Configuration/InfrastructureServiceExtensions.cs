@@ -70,7 +70,7 @@ public static class InfrastructureServiceExtensions
                 sqlOptions.MigrationsAssembly(contextType.Assembly.FullName);
             });
 
-            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
 
             options.AddInterceptors(
                 sp.GetRequiredService<SqlLogInterceptor>(),
