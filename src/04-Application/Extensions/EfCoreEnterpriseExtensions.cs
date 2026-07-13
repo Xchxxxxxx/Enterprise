@@ -57,10 +57,13 @@ public static class EfCoreEnterpriseExtensions
         this IServiceCollection services,
         params Assembly[] assemblies)
     {
-        services.AddInjectables(assemblies);
-        services.AddFluentValidationAuto(assemblies);
-        services.AddMediatRAuto(assemblies);
-        services.AddAutoMapperAuto(assemblies);
+        var frameworkAssembly = typeof(EfCore.Enterprise.Infrastructure.Services.CurrentUserService).Assembly;
+        var allAssemblies = new[] { frameworkAssembly }.Concat(assemblies).ToArray();
+
+        services.AddInjectables(allAssemblies);
+        services.AddFluentValidationAuto(allAssemblies);
+        services.AddMediatRAuto(allAssemblies);
+        services.AddAutoMapperAuto(allAssemblies);
 
         return services;
     }
