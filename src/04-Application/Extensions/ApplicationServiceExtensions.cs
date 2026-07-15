@@ -19,6 +19,7 @@ public static class ApplicationServiceExtensions
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssemblies(assembly);
+            cfg.Lifetime = ServiceLifetime.Scoped;
         });
 
         services.AddAutoMapper(assembly);

@@ -122,7 +122,7 @@ public static class InfrastructureServiceExtensions
         services.AddSingleton<IObjectPoolService, ObjectPoolService>();
         services.AddSingleton<IPerformanceMetrics, PerformanceMetrics>();
         services.AddSingleton<IDeadLetterQueueService, DeadLetterQueueService>();
-        services.AddSingleton<IDomainEventBus, MediatorDomainEventBus>();
+        services.AddScoped<IDomainEventBus, MediatorDomainEventBus>();
         services.AddHostedService<CacheWarmupService>();
 
         if (!string.IsNullOrEmpty(complianceLogPath))

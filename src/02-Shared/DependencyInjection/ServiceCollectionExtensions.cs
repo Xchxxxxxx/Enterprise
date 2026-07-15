@@ -236,6 +236,7 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssemblies(assemblies);
+            cfg.Lifetime = ServiceLifetime.Scoped;
         });
 
         return services;
