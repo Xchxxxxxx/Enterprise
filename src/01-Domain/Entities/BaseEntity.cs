@@ -5,7 +5,7 @@ namespace EfCore.Enterprise.Domain.Entities;
 public abstract class BaseEntity<TKey>
     where TKey : struct
 {
-    public TKey Id { get; private set; } = default!;
+    public TKey Id { get; set; } = default!;
 
     private List<DomainEvent>? _domainEvents;
 

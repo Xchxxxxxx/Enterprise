@@ -16,12 +16,12 @@ public abstract class BaseTreeEntity<TEntity, TKey> : BaseFullEntity<TKey>
         IsLeaf = true;
     }
 
-    public string Name { get; private set; } = string.Empty;
-    public TKey? ParentId { get; private set; }
-    public string Path { get; internal set; } = string.Empty;
-    public int Level { get; internal set; }
-    public int Sort { get; private set; }
-    public bool IsLeaf { get; internal set; }
+    public string Name { get; set; } = string.Empty;
+    public TKey? ParentId { get; set; }
+    public string Path { get; set; } = string.Empty;
+    public int Level { get; set; }
+    public int Sort { get; set; }
+    public bool IsLeaf { get; set; }
 
     [NotMapped]
     public List<TEntity> Children { get; set; } = new();
