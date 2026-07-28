@@ -19,6 +19,8 @@ public static class EfCoreEnterpriseExtensions
         var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("未找到连接字符串 \"DefaultConnection\"");
 
+        var redisConfig = ReadRedisConfiguration(configuration);
+
         services.AddEfCoreControllers();
         services.AddEfCoreSwagger(configuration);
         services.AddEfCoreJwt(configuration);
@@ -26,7 +28,14 @@ public static class EfCoreEnterpriseExtensions
         services.AddEfCoreCors();
         services.AddHealthChecks();
 
-        services.AddInfrastructureServices(connectionString);
+        services.AddInfrastructureServices(
+            connectionString: connectionString,
+            enableRedis: redisConfig.EnableRedis,
+            redisConnection: redisConfig.RedisConnection,
+            enableHangfire: configuration.GetValue<bool>("EfCoreEnterprise:EnableHangfire"),
+            modelCachePath: configuration.GetValue<string>("EfCoreEnterprise:ModelCachePath"),
+            complianceLogPath: configuration.GetValue<string>("EfCoreEnterprise:ComplianceLogPath"));
+
         services.AddApplicationServices();
 
         return services;
@@ -40,6 +49,8 @@ public static class EfCoreEnterpriseExtensions
         var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("未找到连接字符串 \"DefaultConnection\"");
 
+        var redisConfig = ReadRedisConfiguration(configuration);
+
         services.AddEfCoreControllers();
         services.AddEfCoreSwagger(configuration);
         services.AddEfCoreJwt(configuration);
@@ -47,10 +58,36 @@ public static class EfCoreEnterpriseExtensions
         services.AddEfCoreCors();
         services.AddHealthChecks();
 
-        services.AddInfrastructureServices<TContext>(connectionString);
+        services.AddInfrastructureServices<TContext>(
+            connectionString: connectionString,
+            enableRedis: redisConfig.EnableRedis,
+            redisConnection: redisConfig.RedisConnection,
+            enableHangfire: configuration.GetValue<bool>("EfCoreEnterprise:EnableHangfire"),
+            modelCachePath: configuration.GetValue<string>("EfCoreEnterprise:ModelCachePath"),
+            complianceLogPath: configuration.GetValue<string>("EfCoreEnterprise:ComplianceLogPath"));
+
         services.AddApplicationServices();
 
         return services;
+    }
+
+    private static (bool EnableRedis, string? RedisConnection) ReadRedisConfiguration(IConfiguration configuration)
+    {
+        var redisConnection = configuration.GetConnectionString("Redis");
+        
+        var explicitEnable = configuration.GetValue<bool?>("EfCoreEnterprise:EnableRedis");
+        bool enableRedis;
+        
+        if (explicitEnable.HasValue)
+        {
+            enableRedis = explicitEnable.Value && !string.IsNullOrEmpty(redisConnection);
+        }
+        else
+        {
+            enableRedis = !string.IsNullOrEmpty(redisConnection);
+        }
+
+        return (enableRedis, redisConnection);
     }
 
     public static IServiceCollection AddEfCoreAutoInject(
