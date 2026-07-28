@@ -38,7 +38,7 @@ public class AuditInterceptor : ISaveChangesInterceptor
         if (context == null) return;
 
         var userId = GetCurrentUserId();
-        var now = DateTimeOffset.UtcNow;
+        var now = DateTime.Now;
 
         foreach (var entry in context.ChangeTracker.Entries())
         {
@@ -90,6 +90,6 @@ public class AuditInterceptor : ISaveChangesInterceptor
 
     private string GenerateTraceCode()
     {
-        return $"TRACE-{DateTimeOffset.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}";
+        return $"TRACE-{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid():N}";
     }
 }
