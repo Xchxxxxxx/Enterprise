@@ -38,7 +38,7 @@ public class OpLog : BaseEntity<long>
     [MaxLength(50)]
     public string? Ip { get; private set; }
 
-    [MaxLength(500)]
+    [MaxLength(1000)]
     public string? UserAgent { get; private set; }
 
     public long? Elapsed { get; private set; }
