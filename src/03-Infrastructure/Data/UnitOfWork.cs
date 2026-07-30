@@ -47,9 +47,10 @@ public class UnitOfWork : IUnitOfWork
             cancellationToken);
     }
 
-    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        return _transaction;
     }
 
     public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
@@ -125,9 +126,10 @@ public class UnitOfWork<TContext> : IUnitOfWork<TContext>
             cancellationToken);
     }
 
-    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        return _transaction;
     }
 
     public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
