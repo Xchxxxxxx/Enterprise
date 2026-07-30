@@ -21,6 +21,32 @@ public class UnitOfWork : IUnitOfWork
         return await _context.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<T> ExecuteStrategyAsync<T>(Func<Task<T>> operation, CancellationToken cancellationToken = default)
+    {
+        var strategy = _context.Database.CreateExecutionStrategy();
+        T result = default!;
+        await strategy.ExecuteAsync<object?, T>(
+            null,
+            (dbContext, state, ct) => operation(),
+            null,
+            cancellationToken);
+        return result;
+    }
+
+    public async Task ExecuteStrategyAsync(Func<Task> operation, CancellationToken cancellationToken = default)
+    {
+        var strategy = _context.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync<object?, bool>(
+            null,
+            (dbContext, state, ct) =>
+            {
+                operation();
+                return Task.FromResult(true);
+            },
+            null,
+            cancellationToken);
+    }
+
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -71,6 +97,32 @@ public class UnitOfWork<TContext> : IUnitOfWork<TContext>
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<T> ExecuteStrategyAsync<T>(Func<Task<T>> operation, CancellationToken cancellationToken = default)
+    {
+        var strategy = _context.Database.CreateExecutionStrategy();
+        T result = default!;
+        await strategy.ExecuteAsync<object?, T>(
+            null,
+            (dbContext, state, ct) => operation(),
+            null,
+            cancellationToken);
+        return result;
+    }
+
+    public async Task ExecuteStrategyAsync(Func<Task> operation, CancellationToken cancellationToken = default)
+    {
+        var strategy = _context.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync<object?, bool>(
+            null,
+            (dbContext, state, ct) =>
+            {
+                operation();
+                return Task.FromResult(true);
+            },
+            null,
+            cancellationToken);
     }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
