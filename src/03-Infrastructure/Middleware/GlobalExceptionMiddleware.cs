@@ -32,7 +32,7 @@ public class GlobalExceptionMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "未处理异常: {Message}", ex.Message);
-            await HandleExceptionAsync(context, 9999, "服务器内部错误");
+            await HandleExceptionAsync(context, 9999, ex.Message);
         }
     }
 
