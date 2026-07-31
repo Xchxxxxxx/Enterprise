@@ -3,7 +3,6 @@ using System.Text.Json;
 using EfCore.Enterprise.Shared.Exceptions;
 using EfCore.Enterprise.Shared.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace EfCore.Enterprise.Infrastructure.Middleware;
@@ -12,16 +11,13 @@ public class GlobalExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionMiddleware> _logger;
-    private readonly IHostEnvironment _environment;
 
     public GlobalExceptionMiddleware(
         RequestDelegate next,
-        ILogger<GlobalExceptionMiddleware> logger,
-        IHostEnvironment environment)
+        ILogger<GlobalExceptionMiddleware> logger)
     {
         _next = next;
         _logger = logger;
-        _environment = environment;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -92,35 +88,20 @@ public class GlobalExceptionMiddleware
 
     private async Task HandleSystemExceptionAsync(HttpContext context, Exception ex)
     {
-        object response;
-
-        
-            response = new
-            {
-                Success = false,
-                Code = 9999,
-                Message = ex.Message,
-                ExceptionType = ex.GetType().FullName,
-                StackTrace = ex.StackTrace?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(line => line.Trim())
-                    .Take(10)
-                    .ToArray(),
-                InnerException = ex.InnerException?.Message,
-                RequestDetails = new
-                {
-                    Method = context.Request.Method,
-                    Path = $"{context.Request.Path}{context.Request.QueryString}",
-                    QueryParams = context.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString()),
-                    ClientIp = GetClientIpAddress(context),
-                    Headers = context.Request.Headers
-                        .Where(h => h.Key.StartsWith("X-") || h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
-                        .ToDictionary(h => h.Key, h => h.Value.ToString())
-                },
-                Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                TraceId = context.TraceIdentifier
-            };
-        
-        
+        var response = new
+        {
+            Success = false,
+            Code = 9999,
+            Message = ex.Message,
+            ExceptionType = ex.GetType().FullName,
+            StackTrace = ex.StackTrace?.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => line.Trim())
+                .Take(10)
+                .ToArray(),
+            InnerException = ex.InnerException?.Message,
+            Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+            TraceId = context.TraceIdentifier
+        };
 
         await WriteResponseAsync(context, response);
     }
