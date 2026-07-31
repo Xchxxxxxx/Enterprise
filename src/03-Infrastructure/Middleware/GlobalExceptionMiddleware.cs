@@ -94,8 +94,7 @@ public class GlobalExceptionMiddleware
     {
         object response;
 
-        if (_environment.IsDevelopment())
-        {
+        
             response = new
             {
                 Success = false,
@@ -120,18 +119,8 @@ public class GlobalExceptionMiddleware
                 Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
                 TraceId = context.TraceIdentifier
             };
-        }
-        else
-        {
-            response = new
-            {
-                Success = false,
-                Code = 9999,
-                Message = "服务器内部错误，请稍后重试",
-                Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                TraceId = context.TraceIdentifier
-            };
-        }
+        
+        
 
         await WriteResponseAsync(context, response);
     }
