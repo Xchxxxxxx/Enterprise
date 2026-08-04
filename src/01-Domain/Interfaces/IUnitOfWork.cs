@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EfCore.Enterprise.Domain.Interfaces;
@@ -17,8 +18,8 @@ public interface IUnitOfWork : IDisposable
     Task ExecuteStrategyAsync(Func<Task> operation, CancellationToken cancellationToken = default);
 }
 
-public interface IUnitOfWork<TContext> 
-    where TContext : class
+public interface IUnitOfWork<TContext>
+    where TContext : DbContext
 {
     TContext Context { get; }
      Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
