@@ -1,11 +1,12 @@
 using AutoMapper;
 using EfCore.Enterprise.Domain.Interfaces;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.Enterprise.Application.Services;
 
 public abstract class BaseService<TContext>
-    where TContext : class
+    where TContext : DbContext
 {
     protected readonly IUnitOfWork<TContext> UnitOfWork;
     protected readonly IMapper Mapper;
@@ -23,7 +24,7 @@ public abstract class BaseService<TContext>
 
 public abstract class BaseService<TEntity, TDto, TCreateDto, TUpdateDto, TContext> : BaseService<TContext>
     where TEntity : class
-    where TContext : class
+    where TContext : DbContext
 {
     protected readonly ISuperRepository<TEntity> Repository;
 
