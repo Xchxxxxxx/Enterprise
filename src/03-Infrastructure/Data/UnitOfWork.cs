@@ -1,6 +1,7 @@
 using EfCore.Enterprise.Domain.Interfaces;
 using EfCore.Enterprise.Infrastructure.Data;
 using EfCore.Enterprise.Shared.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace EfCore.Enterprise.Infrastructure.Data;
@@ -82,7 +83,7 @@ public class UnitOfWork : IUnitOfWork
 }
 
 public class UnitOfWork<TContext> : IUnitOfWork<TContext>
-    where TContext : AppDbContext
+    where TContext : DbContext
 {
     private readonly TContext _context;
     private IDbContextTransaction? _transaction;
